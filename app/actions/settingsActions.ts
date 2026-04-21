@@ -4,7 +4,7 @@ import dbConnect from '@/lib/mongodb';
 import UserSettings from '@/models/UserSettings';
 import { revalidatePath } from 'next/cache';
 
-const USER_ID = 'anonymous_user'; // Hardcoded for this clone
+const USER_ID = 'anonymous_user';
 
 export async function getUserSettings() {
     await dbConnect();
@@ -24,7 +24,7 @@ export async function updateUserSettings(data: any) {
         await UserSettings.findOneAndUpdate(
             { userId: USER_ID },
             { $set: data },
-            { new: true, upsert: true }
+            { returnDocument: 'after', upsert: true }
         );
 
         revalidatePath('/profile');
