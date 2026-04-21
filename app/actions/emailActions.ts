@@ -81,7 +81,7 @@ export async function sendApplicationEmail(data: {
             attachments: [
                 {
                     filename: resume.fileName,
-                    href: resume.fileUrl,
+                    path: resume.fileUrl,
                     contentType: 'application/pdf'
                 }
             ]
