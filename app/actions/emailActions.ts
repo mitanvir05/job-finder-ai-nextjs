@@ -51,6 +51,14 @@ export async function sendApplicationEmail(data: {
             processedBody += `\n\n--\n${settings.emailSignature}`;
         }
 
+        // Automatically append Profile Links to the bottom of the email if they exist
+        if (settings.portfolioLink || settings.githubLink || settings.linkedinLink) {
+            processedBody += `\n`; // Add a little spacing
+            if (settings.portfolioLink) processedBody += `\nPortfolio: ${settings.portfolioLink}`;
+            if (settings.githubLink) processedBody += `\nGitHub: ${settings.githubLink}`;
+            if (settings.linkedinLink) processedBody += `\nLinkedIn: ${settings.linkedinLink}`;
+        }
+
         const transporter = nodemailer.createTransport({
             host: settings.smtpHost,
             port: Number(settings.smtpPort) || 465,
