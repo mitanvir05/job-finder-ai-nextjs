@@ -16,7 +16,7 @@ export async function sendApplicationEmail(data: {
     company: string;
     jobTitle: string;
     recruiterEmail: string;
-    recruiterName?: string; 
+    recruiterName?: string;
     templateSubject: string;
     templateBody: string;
     resumeId: string;
@@ -73,7 +73,7 @@ export async function sendApplicationEmail(data: {
             attachments: [
                 {
                     filename: resume.fileName,
-                    content: fileBuffer,
+                    href: resume.fileUrl,
                     contentType: 'application/pdf'
                 }
             ]

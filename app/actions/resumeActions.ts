@@ -1,12 +1,18 @@
 'use server'
 
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { v2 as cloudinary } from 'cloudinary';
 import dbConnect from '@/lib/mongodb';
 import Resume from '@/models/Resume';
 import { revalidatePath } from 'next/cache';
 
 const USER_ID = 'anonymous_user';
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function getResumes() {
     await dbConnect();
@@ -17,34 +23,26 @@ export async function getResumes() {
 export async function uploadResume(formData: FormData) {
     const file: File | null = formData.get('file') as unknown as File;
 
-    if (!file) {
-        return { success: false, error: "No file uploaded." };
-    }
+    if (!file) return { success: false, error: "No file uploaded." };
 
     try {
-        // 1. Prepare the file buffer
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // 2. Define the path (public/uploads folder)
-        const uploadDir = join(process.cwd(), 'public', 'uploads');
+        // Upload directly to Cloudinary from memory buffer
+        const uploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { resource_type: 'raw' },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            uploadStream.end(buffer);
+        });
 
-        // Ensure the directory exists
-        try {
-            await mkdir(uploadDir, { recursive: true });
-        } catch (e) {
-            // Directory already exists, do nothing
-        }
+        const fileUrl = (uploadResult as any).secure_url;
 
-        // 3. Create a unique filename to prevent overwriting
-        const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-        const filePath = join(uploadDir, uniqueName);
-
-        // 4. Save the file locally
-        await writeFile(filePath, buffer);
-        const fileUrl = `/uploads/${uniqueName}`;
-
-        // 5. Save the record in MongoDB
         await dbConnect();
         const count = await Resume.countDocuments({ userId: USER_ID });
 
@@ -53,21 +51,21 @@ export async function uploadResume(formData: FormData) {
             fileName: file.name,
             fileUrl: fileUrl,
             fileSize: file.size,
-            isDefault: count === 0 // Make it the default if it's the first resume
+            isDefault: count === 0
         });
 
         revalidatePath('/resumes');
         return { success: true };
     } catch (error) {
-        console.error("Upload error:", error);
-        return { success: false, error: "Failed to upload file." };
+        console.error(error);
+        return { success: false, error: "Failed to upload file to Cloudinary." };
     }
 }
 
 export async function deleteResume(id: string) {
     await dbConnect();
+    // Optional: Add logic here to delete the file from Cloudinary as well
     await Resume.findByIdAndDelete(id);
-    // Note: For a production app, you would also delete the physical file using fs.unlink() here
     revalidatePath('/resumes');
     return { success: true };
 }

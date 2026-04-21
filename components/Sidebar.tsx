@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Zap,
-  CopyMinus,
   Sparkles,
   Send,
   FileText,
@@ -21,7 +20,6 @@ import {
 const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Quick Send", href: "/quick-send", icon: Zap },
-  { name: "Bulk Send", href: "/bulk-send", icon: CopyMinus },
   { name: "AI Job Finder", href: "/job-finder", icon: Sparkles },
   { name: "Applications", href: "/applications", icon: Send },
   { name: "Resumes", href: "/resumes", icon: FileText },
