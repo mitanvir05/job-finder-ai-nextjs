@@ -45,7 +45,7 @@ export default function JobFinderPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white mb-2">AI Job Finder</h1>
         <p className="text-[var(--color-text-secondary)] text-sm">
-          Harness Gemini 1.5 Pro to scour the internet for job openings and extract recruiter emails automatically.
+          Use Gemini to find job openings online and collect recruiter email addresses automatically.
         </p>
       </div>
 
