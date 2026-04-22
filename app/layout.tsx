@@ -6,8 +6,9 @@ import Sidebar from "@/components/Sidebar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "JobFinder AI",
-  description: "Fast Job Applications",
+  title: "AI Job Finder | Smart Job Search & Recruiter Email Extractor",
+  description:
+    "Use AI to find job openings online and automatically extract recruiter email addresses. Apply faster and smarter.",
 };
 
 export default function RootLayout({
